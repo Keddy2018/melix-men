@@ -92,6 +92,23 @@ public class MutantImpl implements MutantService {
         return matriz;
     }
 
+    private int[] moverMatriz(int diferenciaMatriz, int[] cordenadas){
+        int[] cordenadasNuevas = {0,0};
+        if(cordenadas != cordenadasNuevas){
+                if(cordenadasNuevas[0] < diferenciaMatriz){
+                    cordenadasNuevas[0]++;
+                }else{
+                    cordenadasNuevas[1]++;
+                    cordenadasNuevas[0] = 0;
+                    if (cordenadasNuevas[1] == diferenciaMatriz){
+                        cordenadasNuevas = {-1,-1};
+                    }
+                }
+        }else{
+            return cordenadasNuevas;
+        }
+    }
+
     private int buscarMutante(char[][] matrizDna, char[][] matrizMuestra) {
         int coincidenciaPosibleMutante = 0;
         int movimientoDeMatriz = matrizDna.length - matrizMuestra.length;

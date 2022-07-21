@@ -4,11 +4,13 @@ import com.api.xmen.services.MutantService;
 
 public class MutantImpl implements MutantService {
     private String dnaLetraPosible = "ATCG";
+    private int movimientos = 0;
 
     @Override
     public boolean isMutant(String[] dna) {
         int coincidenciaDnaMutante = 0;
         if (isDnaValid(dna)) {
+            this.movimientos = dna.length - dnaLetraPosible.length();
             char[][] matrizDna = mostrarMatriz(crearMatrizDna(dna));
             for (int i = 0; i < dnaLetraPosible.length(); i++) {
                 for (int j = 0; j < dnaLetraPosible.length(); j++) {
@@ -92,41 +94,38 @@ public class MutantImpl implements MutantService {
         return matriz;
     }
 
-    private int[] moverMatriz(int diferenciaMatriz, int[] cordenadas){
+    private int[] moverMatriz(int[] cordenadas){
         int[] cordenadasNuevas = {0,0};
         if(cordenadas != cordenadasNuevas){
-                if(cordenadasNuevas[0] < diferenciaMatriz){
-                    cordenadasNuevas[0]++;
+                if(cordenadas[0] < this.movimientos){  //X = 0  1  2   Y=
+                    cordenadas[0]++;
                 }else{
-                    cordenadasNuevas[1]++;
-                    cordenadasNuevas[0] = 0;
-                    if (cordenadasNuevas[1] == diferenciaMatriz){
-                        cordenadasNuevas = {-1,-1};
-                    }
+                    cordenadas[1]++;
+                    cordenadas[0] = 0;
                 }
-        }else{
-            return cordenadasNuevas;
+                return cordenadas;
         }
+        return cordenadasNuevas;
     }
 
     private int buscarMutante(char[][] matrizDna, char[][] matrizMuestra) {
         int coincidenciaPosibleMutante = 0;
         int movimientoDeMatriz = matrizDna.length - matrizMuestra.length;
-        for (int n = 0; n <= movimientoDeMatriz; n++) {
-            for (int m = 0; m <= movimientoDeMatriz; m++) {
-                int coincidenciasLetraDna = 0;
-                for (int i = 0; i < matrizMuestra.length; i++) {
-                    for (int j = 0; j < matrizMuestra.length; j++) {
-                        if (matrizDna[i+n][j + m] == matrizMuestra[i][j]) {
-                            coincidenciasLetraDna++;
-                        }
-                    }
-                    if (coincidenciasLetraDna == matrizMuestra.length) {
-                        System.out.println("    -->  ENCONTRE UN POSIBLE ADN " + coincidenciasLetraDna);
-                        coincidenciaPosibleMutante++;
+        int[] cordenadas = {0,0};
+        while(cordenadas[1] <= this.movimientos){
+            int coincidenciasLetraDna = 0;
+            for (int y = 0; y < matrizMuestra.length; y++) {
+                for (int x = 0; x < matrizMuestra.length; x++) {
+                    if (matrizDna[x + cordenadas[0]][y + cordenadas[1]] == matrizMuestra[x][y]) {
+                        coincidenciasLetraDna++;
                     }
                 }
+                if (coincidenciasLetraDna == matrizMuestra.length) {
+                    System.out.println("    -->  ENCONTRE UN POSIBLE ADN " + coincidenciasLetraDna  +  "   en las cordenadas : " + "X: " + cordenadas[0] + "  Y: " + cordenadas[1]);
+                    coincidenciaPosibleMutante++;
+                }
             }
+            cordenadas = moverMatriz(cordenadas);
         }
         return coincidenciaPosibleMutante;
     }
